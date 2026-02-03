@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TTS 语音生成器</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}" />
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <div class="grain"></div>
+
+  <main class="app-shell">
+    <header class="glass hero-layer reveal">
+      <p class="eyebrow"><i data-lucide="sparkles"></i>ZEN-IOS HYBRID · LOCAL MODE</p>
+      <h1>TTS 语音生成器</h1>
+      <p class="hero-copy">冷灰毛玻璃风格，保持柔和光学触感，同时用物理描边保证边界清晰。</p>
+      <div class="tag-row">
+        <span class="tag"><i data-lucide="layers-3"></i>自动长文本分段</span>
+        <span class="tag"><i data-lucide="audio-lines"></i>专业语音参数</span>
+        <span class="tag"><i data-lucide="download"></i>直接试听下载</span>
+      </div>
+    </header>
+
+    <section class="workspace reveal">
+      <section class="glass panel input-panel">
+        <div class="panel-title-row">
+          <h2><i data-lucide="file-text"></i>文本输入</h2>
+          <span class="hint-badge">SUPPORTS LONG ARTICLES</span>
+        </div>
+        <label class="field-label" for="textInput">输入文本</label>
+        <textarea id="textInput" rows="12" placeholder="把你要转成语音的内容粘贴到这里..."></textarea>
+        <div class="meta-row">
+          <span id="charCount">0 字</span>
+          <span class="hint">系统自动拆分过长段落</span>
+        </div>
+      </section>
+
+      <section class="glass panel controls-panel">
+        <div class="panel-title-row">
+          <h2><i data-lucide="sliders-horizontal"></i>声音设置</h2>
+          <span class="hint-badge">DEFAULTS READY</span>
+        </div>
+        <div class="grid">
+          <div>
+            <label class="field-label" for="voiceSelect">音色</label>
+            <select id="voiceSelect">
+              <option value="zh-CN-XiaoxiaoNeural">zh-CN-XiaoxiaoNeural（女声·默认）</option>
+              <option value="zh-CN-YunxiNeural">zh-CN-YunxiNeural（男声）</option>
+              <option value="zh-CN-YunjianNeural">zh-CN-YunjianNeural（男声）</option>
+              <option value="zh-CN-XiaoyiNeural">zh-CN-XiaoyiNeural（女声）</option>
+              <option value="zh-CN-YunyangNeural">zh-CN-YunyangNeural（男声）</option>
+              <option value="zh-CN-XiaohanNeural">zh-CN-XiaohanNeural（女声）</option>
+              <option value="zh-CN-XiaomoNeural">zh-CN-XiaomoNeural（女声）</option>
+              <option value="zh-CN-YunfengNeural">zh-CN-YunfengNeural（男声）</option>
+              <option value="zh-CN-XiaoxiaoMultilingualNeural">zh-CN-XiaoxiaoMultilingualNeural（多语女声）</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="styleSelect">风格</label>
+            <select id="styleSelect">
+              <option value="narration-relaxed" selected>narration-relaxed（轻松解说）</option>
+              <option value="general">general（通用）</option>
+              <option value="cheerful">cheerful（愉快）</option>
+              <option value="sad">sad（悲伤）</option>
+              <option value="angry">angry（愤怒）</option>
+              <option value="friendly">friendly（友好）</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="rateInput">语速（-100 到 100）</label>
+            <input id="rateInput" type="number" min="-100" max="100" value="0" />
+          </div>
+          <div>
+            <label class="field-label" for="pitchInput">音调（-100 到 100）</label>
+            <input id="pitchInput" type="number" min="-100" max="100" value="0" />
+          </div>
+        </div>
+
+        <section class="actions">
+          <button id="generateBtn" disabled>生成语音</button>
+          <span id="statusText" class="status-pill">请输入文字后开始。</span>
+        </section>
+      </section>
+    </section>
+
+    <section id="errorBox" class="glass error hidden"></section>
+
+    <section id="resultBox" class="glass panel result hidden">
+      <div class="panel-title-row">
+        <h2><i data-lucide="headphones"></i>生成结果</h2>
+        <span class="hint-badge">PLAY OR DOWNLOAD</span>
+      </div>
+      <audio id="audioPlayer" controls></audio>
+      <a id="downloadLink" class="download-link" download><i data-lucide="download"></i><span>下载 MP3</span></a>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <script>
+    if (window.lucide) {
+      window.lucide.createIcons({ attrs: { "stroke-width": "1.75" } });
+    }
+  </script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
