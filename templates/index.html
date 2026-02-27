@@ -98,6 +98,80 @@
       <audio id="audioPlayer" controls></audio>
       <a id="downloadLink" class="download-link" download><i data-lucide="download"></i><span>下载 MP3</span></a>
     </section>
+
+    <!-- ───── 音频转录与智能分析 ───── -->
+    <section class="transcribe-section reveal">
+      <section class="workspace transcribe-grid">
+        <section class="glass panel upload-panel">
+          <div class="panel-title-row">
+            <h2><i data-lucide="mic"></i>音频转录与智能分析</h2>
+            <span class="hint-badge">TRANSCRIBE &amp; ANALYZE</span>
+          </div>
+          <p class="api-key-notice"><i data-lucide="key"></i> InfiniteAI API 已内置（Key: sk-X_8Tbr4jwJm-JDPQFasYAdla_Ts6AA9K）</p>
+
+          <label class="field-label">上传音频</label>
+          <div id="uploadZone" class="upload-zone">
+            <input type="file" id="audioFileInput" accept=".mp3,.wav,.m4a,.ogg,.webm,.flac,.aac" />
+            <div class="upload-prompt">
+              <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p class="upload-title">点击或拖拽上传音频文件</p>
+              <p class="upload-hint">支持 MP3 / WAV / M4A / OGG / WebM（最大 25 MB）</p>
+            </div>
+          </div>
+
+          <div id="fileInfo" class="file-info hidden">
+            <i data-lucide="file-audio"></i>
+            <span id="fileName" class="file-name">—</span>
+            <span id="fileSize" class="file-size">—</span>
+            <button id="removeFileBtn" class="remove-file-btn" type="button" title="移除文件">&times;</button>
+          </div>
+
+          <section class="actions">
+            <button id="transcribeBtn" class="btn-action" disabled>开始转录</button>
+            <span id="transcribeStatus" class="status-pill">请上传音频文件。</span>
+          </section>
+        </section>
+
+        <section id="transcribeResultPanel" class="glass panel hidden">
+          <div class="panel-title-row">
+            <h2><i data-lucide="file-text"></i>转录结果</h2>
+            <span class="hint-badge">EDITABLE</span>
+          </div>
+          <textarea id="transcribeOutput" rows="10" placeholder="转录结果将显示在这里…"></textarea>
+          <div class="meta-row">
+            <span id="transcribeCharCount">0 字</span>
+            <span class="hint">可编辑后再分析</span>
+          </div>
+
+          <section class="actions">
+            <button id="analyzeBtn" class="btn-action">🚀 使用 GPT-5 智能分析</button>
+            <span id="analyzeStatus" class="status-pill"></span>
+          </section>
+        </section>
+      </section>
+
+      <section id="analysisResultPanel" class="glass panel analysis-panel hidden">
+        <div class="panel-title-row">
+          <h2><i data-lucide="sparkles"></i>智能分析结果</h2>
+          <span class="hint-badge">GPT-5</span>
+        </div>
+        <div id="analysisOutput" class="analysis-content"></div>
+      </section>
+
+      <section id="exportPanel" class="glass panel export-panel hidden">
+        <div class="panel-title-row">
+          <h2><i data-lucide="share-2"></i>导出</h2>
+          <span class="hint-badge">DOWNLOAD</span>
+        </div>
+        <div class="export-row">
+          <button id="exportTranscriptBtn" class="download-link" type="button"><i data-lucide="file-text"></i><span>导出转录文本 (.txt)</span></button>
+          <button id="exportAnalysisBtn" class="download-link" type="button"><i data-lucide="file-check"></i><span>导出分析结果 (.md)</span></button>
+          <button id="exportFullBtn" class="download-link" type="button"><i data-lucide="files"></i><span>导出完整报告 (.txt)</span></button>
+        </div>
+      </section>
+    </section>
+
+    <section id="transcribeErrorBox" class="glass error hidden"></section>
   </main>
 
   <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>

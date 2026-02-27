@@ -2,11 +2,23 @@ from __future__ import annotations
 
 from datetime import datetime
 
+import requests as http_client
 from flask import Flask, Response, jsonify, render_template, request
 
 from tts_service import ValidationError, get_available_voices, synthesize_text, validate_synthesis_payload
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 25 * 1024 * 1024
+
+TRANSCRIBE_API_URL = "https://api.infiniteai.cc/v1/audio/transcriptions"
+TRANSCRIBE_API_KEY = "sk-X_8Tbr4jwJm-JDPQFasYAdla_Ts6AA9K"
+ANALYZE_API_URL = "https://api.infiniteai.cc/v1/chat/completions"
+ANALYZE_MODEL = "gpt-5"
+ANALYZE_SYSTEM_PROMPT = (
+    "你是一个专业的中文助手。请对以下音频转录内容进行："
+    "1. 简洁总结 2. 提取关键点 3. 给出实用行动建议。"
+    "用清晰的 Markdown 格式回复。"
+)
 
 
 def error_response(error_code: str, message: str, status_code: int) -> Response:
@@ -50,6 +62,80 @@ def synthesize() -> Response:
     filename = datetime.now().strftime("tts_%Y%m%d_%H%M%S.mp3")
     headers = {"Content-Disposition": f'attachment; filename="{filename}"'}
     return Response(audio_data, status=200, mimetype="audio/mpeg", headers=headers)
+
+
+@app.post("/api/transcribe")
+def transcribe():
+    if "file" not in request.files:
+        return error_response("no_file", "请上传音频文件。", 400)
+
+    audio_file = request.files["file"]
+    if not audio_file.filename:
+        return error_response("no_file", "请选择一个有效的音频文件。", 400)
+
+    try:
+        file_bytes = audio_file.read()
+        resp = http_client.post(
+            TRANSCRIBE_API_URL,
+            headers={"Authorization": f"Bearer {TRANSCRIBE_API_KEY}"},
+            files={"file": (audio_file.filename, file_bytes)},
+            data={"model": "whisper-1", "response_format": "text"},
+            timeout=120,
+        )
+        resp.raise_for_status()
+        try:
+            data = resp.json()
+            text = data.get("text", resp.text)
+        except ValueError:
+            text = resp.text
+        return jsonify({"text": text})
+    except http_client.exceptions.Timeout:
+        return error_response("timeout", "转录超时，请尝试较短的音频文件。", 504)
+    except http_client.exceptions.RequestException as exc:
+        return error_response("transcribe_failed", f"转录失败：{exc}", 500)
+    except Exception as exc:
+        return error_response("transcribe_failed", f"转录失败：{exc}", 500)
+
+
+@app.post("/api/analyze")
+def analyze():
+    payload = request.get_json(silent=True)
+    if not payload or not payload.get("text", "").strip():
+        return error_response("no_text", "请提供要分析的文本。", 400)
+
+    try:
+        resp = http_client.post(
+            ANALYZE_API_URL,
+            headers={
+                "Authorization": f"Bearer {TRANSCRIBE_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": ANALYZE_MODEL,
+                "messages": [
+                    {"role": "system", "content": ANALYZE_SYSTEM_PROMPT},
+                    {"role": "user", "content": payload["text"]},
+                ],
+            },
+            timeout=120,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        content = data["choices"][0]["message"]["content"]
+        return jsonify({"analysis": content})
+    except http_client.exceptions.Timeout:
+        return error_response("timeout", "分析超时，请稍后重试。", 504)
+    except (KeyError, IndexError):
+        return error_response("analyze_failed", "分析返回格式异常。", 500)
+    except http_client.exceptions.RequestException as exc:
+        return error_response("analyze_failed", f"分析失败：{exc}", 500)
+    except Exception as exc:
+        return error_response("analyze_failed", f"分析失败：{exc}", 500)
+
+
+@app.errorhandler(413)
+def file_too_large(e):
+    return error_response("file_too_large", "文件过大，最大支持 25MB。", 413)
 
 
 if __name__ == "__main__":
