@@ -67,34 +67,43 @@ def synthesize() -> Response:
 @app.post("/api/transcribe")
 def transcribe():
     if "file" not in request.files:
-        return error_response("no_file", "请上传音频文件。", 400)
+        return error_response("no_file", "没有收到文件", 400)
 
     audio_file = request.files["file"]
     if not audio_file.filename:
         return error_response("no_file", "请选择一个有效的音频文件。", 400)
 
     try:
-        file_bytes = audio_file.read()
+        files = {"file": (audio_file.filename, audio_file.stream, audio_file.mimetype)}
+        data = {
+            "model": "whisper-1",
+            "response_format": "text",
+            "language": "zh",
+        }
+        headers = {"Authorization": f"Bearer {TRANSCRIBE_API_KEY}"}
+
         resp = http_client.post(
             TRANSCRIBE_API_URL,
-            headers={"Authorization": f"Bearer {TRANSCRIBE_API_KEY}"},
-            files={"file": (audio_file.filename, file_bytes)},
-            data={"model": "whisper-1", "response_format": "text"},
+            headers=headers,
+            files=files,
+            data=data,
             timeout=120,
         )
-        resp.raise_for_status()
-        try:
-            data = resp.json()
-            text = data.get("text", resp.text)
-        except ValueError:
-            text = resp.text
-        return jsonify({"text": text})
+
+        if resp.status_code == 200:
+            try:
+                result = resp.json()
+                text = result.get("text", resp.text).strip()
+            except ValueError:
+                text = resp.text.strip()
+            return jsonify({"text": text})
+        else:
+            error_msg = resp.text[:200] or f"HTTP {resp.status_code}"
+            return jsonify({"error": error_msg}), resp.status_code
     except http_client.exceptions.Timeout:
         return error_response("timeout", "转录超时，请尝试较短的音频文件。", 504)
-    except http_client.exceptions.RequestException as exc:
-        return error_response("transcribe_failed", f"转录失败：{exc}", 500)
     except Exception as exc:
-        return error_response("transcribe_failed", f"转录失败：{exc}", 500)
+        return jsonify({"error": f"后端错误: {str(exc)}"}), 500
 
 
 @app.post("/api/analyze")

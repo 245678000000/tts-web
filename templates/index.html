@@ -1,180 +1,179 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="auto">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TTS 语音生成器</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}" />
+  <script>
+    (function(){
+      var t=localStorage.getItem('theme')||'auto';
+      var d=document.documentElement;
+      if(t==='auto'){d.setAttribute('data-theme',window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');}
+      else{d.setAttribute('data-theme',t);}
+      d.setAttribute('data-pref',t);
+    })();
+  </script>
 </head>
 <body>
-  <div class="ambient ambient-a"></div>
-  <div class="ambient ambient-b"></div>
-  <div class="grain"></div>
+  <main class="shell">
+    <!-- ═══ Bento Container ═══ -->
+    <div class="bento">
 
-  <main class="app-shell">
-    <header class="glass hero-layer reveal">
-      <p class="eyebrow"><i data-lucide="sparkles"></i>ZEN-IOS HYBRID · LOCAL MODE</p>
-      <h1>TTS 语音生成器</h1>
-      <div class="tag-row">
-        <span class="tag"><i data-lucide="layers-3"></i>智能文本分段</span>
-        <span class="tag"><i data-lucide="audio-lines"></i>语音调优参数</span>
-        <span class="tag"><i data-lucide="download"></i>一键试听下载</span>
+      <!-- ── Header Zone ── -->
+      <header class="bento-header">
+        <div class="header-left">
+          <h1>TTS 语音生成器</h1>
+          <span class="mode-badge">ZEN-IOS HYBRID • LOCAL MODE</span>
+        </div>
+        <button id="themeToggle" class="theme-toggle" type="button" title="切换主题">
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span id="themeLabel" class="theme-label">自动</span>
+        </button>
+      </header>
+
+      <!-- ── Badges ── -->
+      <div class="bento-badges">
+        <span class="feat-badge">智能文本分段</span>
+        <span class="feat-badge">语音调优参数</span>
+        <span class="feat-badge">一键试听下载</span>
       </div>
-    </header>
 
-    <section class="workspace reveal">
-      <!-- ── Left: 文本转语音 ── -->
-      <section class="glass panel tts-panel">
-        <div class="panel-title-row">
-          <h2><i data-lucide="volume-2"></i>文本转语音</h2>
-        </div>
+      <!-- ── Main Workspace (two-column grid) ── -->
+      <div class="bento-workspace">
 
-        <textarea id="textInput" rows="10" placeholder="请在此输入或粘贴文本..."></textarea>
-        <div class="meta-row">
-          <span id="charCount">0 / 5000 字</span>
-          <span class="hint">支持长文本</span>
-        </div>
-
-        <div class="controls-divider"></div>
-
-        <div class="grid">
-          <div>
-            <label class="field-label" for="voiceSelect">选择音色</label>
-            <select id="voiceSelect">
-              <option value="zh-CN-XiaoxiaoNeural">晓晓（女声 · 默认）</option>
-              <option value="zh-CN-YunxiNeural">云希（男声）</option>
-              <option value="zh-CN-YunjianNeural">云健（男声）</option>
-              <option value="zh-CN-XiaoyiNeural">晓伊（女声）</option>
-              <option value="zh-CN-YunyangNeural">云扬（男声）</option>
-              <option value="zh-CN-XiaohanNeural">晓涵（女声）</option>
-              <option value="zh-CN-XiaomoNeural">晓墨（女声）</option>
-              <option value="zh-CN-YunfengNeural">云枫（男声）</option>
-              <option value="zh-CN-XiaoxiaoMultilingualNeural">晓晓 · 多语（女声）</option>
-            </select>
+        <!-- Panel A: 文本转语音 -->
+        <section class="cell cell-tts">
+          <h2 class="cell-title">文本输入</h2>
+          <textarea id="textInput" rows="8" placeholder="请在此输入或粘贴文本..."></textarea>
+          <div class="meta-row">
+            <span id="charCount">0 / 5000 字</span>
+            <span class="meta-hint">支持长文本</span>
           </div>
-          <div>
-            <label class="field-label" for="styleSelect">选择风格</label>
-            <select id="styleSelect">
-              <option value="narration-relaxed" selected>轻松解说</option>
-              <option value="general">通用</option>
-              <option value="cheerful">愉快</option>
-              <option value="sad">悲伤</option>
-              <option value="angry">愤怒</option>
-              <option value="friendly">友好</option>
-            </select>
-          </div>
-        </div>
 
-        <div class="slider-group">
-          <div class="slider-row">
-            <div class="slider-label-row">
-              <label class="field-label">语速（-100 到 100）</label>
-              <span class="slider-val" id="rateValue">0</span>
+          <div class="cell-divider"></div>
+
+          <div class="controls-grid">
+            <div>
+              <label class="ctrl-label" for="voiceSelect">音色</label>
+              <select id="voiceSelect">
+                <option value="zh-CN-XiaoxiaoNeural">晓晓（女声 · 默认）</option>
+                <option value="zh-CN-YunxiNeural">云希（男声）</option>
+                <option value="zh-CN-YunjianNeural">云健（男声）</option>
+                <option value="zh-CN-XiaoyiNeural">晓伊（女声）</option>
+                <option value="zh-CN-YunyangNeural">云扬（男声）</option>
+                <option value="zh-CN-XiaohanNeural">晓涵（女声）</option>
+                <option value="zh-CN-XiaomoNeural">晓墨（女声）</option>
+                <option value="zh-CN-YunfengNeural">云枫（男声）</option>
+                <option value="zh-CN-XiaoxiaoMultilingualNeural">晓晓 · 多语（女声）</option>
+              </select>
             </div>
-            <input type="range" id="rateInput" min="-100" max="100" value="0" />
-          </div>
-          <div class="slider-row">
-            <div class="slider-label-row">
-              <label class="field-label">音调（-100 到 100）</label>
-              <span class="slider-val" id="pitchValue">0</span>
+            <div>
+              <label class="ctrl-label" for="styleSelect">风格</label>
+              <select id="styleSelect">
+                <option value="narration-relaxed" selected>轻松解说</option>
+                <option value="general">通用</option>
+                <option value="cheerful">愉快</option>
+                <option value="sad">悲伤</option>
+                <option value="angry">愤怒</option>
+                <option value="friendly">友好</option>
+              </select>
             </div>
-            <input type="range" id="pitchInput" min="-100" max="100" value="0" />
           </div>
-        </div>
 
-        <section class="actions">
-          <button id="generateBtn" disabled>生成语音</button>
-          <span id="statusText" class="status-pill">等待输入</span>
-        </section>
-      </section>
-
-      <!-- ── Right: 音频分析 ── -->
-      <section class="glass panel audio-panel">
-        <div class="panel-title-row">
-          <h2><i data-lucide="mic"></i>音频分析</h2>
-        </div>
-
-        <div id="uploadZone" class="upload-zone">
-          <input type="file" id="audioFileInput" accept=".mp3,.wav,.m4a,.ogg,.webm,.flac,.aac" />
-          <div class="upload-prompt">
-            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <p class="upload-title">点击或拖拽上传音频文件</p>
-            <p class="upload-hint">支持 MP3, WAV, M4A, OGG, WebM（最大 25 MB）</p>
+          <div class="slider-group">
+            <div class="slider-row">
+              <div class="slider-head"><label class="ctrl-label">语速（-100 到 100）</label><span class="slider-num" id="rateValue">0</span></div>
+              <input type="range" id="rateInput" min="-100" max="100" value="0" />
+            </div>
+            <div class="slider-row">
+              <div class="slider-head"><label class="ctrl-label">音调（-100 到 100）</label><span class="slider-num" id="pitchValue">0</span></div>
+              <input type="range" id="pitchInput" min="-100" max="100" value="0" />
+            </div>
           </div>
-        </div>
 
-        <div id="fileInfo" class="file-info hidden">
-          <i data-lucide="file-audio"></i>
-          <span id="fileName" class="file-name">—</span>
-          <span id="fileSize" class="file-size">—</span>
-          <button id="removeFileBtn" class="remove-file-btn" type="button" title="移除文件">&times;</button>
-        </div>
-
-        <section class="actions">
-          <button id="transcribeBtn" class="btn-action" disabled>开始转录</button>
-          <span id="transcribeStatus" class="status-pill">请上传音频文件。</span>
+          <div class="action-row">
+            <button id="generateBtn" class="btn-primary" disabled>生成语音</button>
+            <span id="statusText" class="status-text">等待输入...</span>
+          </div>
         </section>
-      </section>
-    </section>
 
-    <!-- ── Result sections (below workspace) ── -->
-    <section id="errorBox" class="glass error hidden"></section>
+        <!-- Panel B: 音频分析 -->
+        <section class="cell cell-audio">
+          <h2 class="cell-title">音频分析</h2>
 
-    <section id="resultBox" class="glass panel result-section hidden">
-      <div class="panel-title-row">
-        <h2><i data-lucide="headphones"></i>生成结果</h2>
+          <div id="uploadZone" class="upload-zone">
+            <input type="file" id="audioFileInput" accept=".mp3,.wav,.m4a,.ogg,.webm,.flac,.aac" />
+            <div class="upload-inner">
+              <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p class="upload-title">点击或拖拽上传音频文件</p>
+              <p class="upload-sub">支持格式: MP3, WAV, M4A, OGG, WebM（最大 25 MB）</p>
+            </div>
+          </div>
+
+          <div id="fileInfo" class="file-info hidden">
+            <span id="fileName" class="file-name">—</span>
+            <span id="fileSize" class="file-size">—</span>
+            <button id="removeFileBtn" class="remove-btn" type="button" title="移除文件">&times;</button>
+          </div>
+
+          <div class="action-row">
+            <button id="transcribeBtn" class="btn-outline" disabled>开始转录</button>
+            <span id="transcribeStatus" class="status-text">请上传音频文件。</span>
+          </div>
+        </section>
       </div>
+    </div>
+
+    <!-- ═══ Result Sections (below bento) ═══ -->
+    <section id="errorBox" class="result-card error-card hidden"></section>
+
+    <section id="resultBox" class="result-card hidden">
+      <h3 class="result-title">生成结果</h3>
       <audio id="audioPlayer" controls></audio>
-      <a id="downloadLink" class="download-link" download><i data-lucide="download"></i><span>下载 MP3</span></a>
+      <a id="downloadLink" class="btn-outline" download>下载 MP3</a>
     </section>
 
-    <section id="transcribeResultPanel" class="glass panel result-section hidden">
-      <div class="panel-title-row">
-        <h2><i data-lucide="file-text"></i>转录结果</h2>
-        <span class="hint-badge">可编辑</span>
+    <section id="transcribeResultPanel" class="result-card hidden">
+      <div class="result-head">
+        <h3 class="result-title">转录结果</h3>
+        <span class="result-badge">可编辑</span>
       </div>
-      <textarea id="transcribeOutput" rows="10" placeholder="转录结果将显示在这里…"></textarea>
+      <textarea id="transcribeOutput" rows="8" placeholder="转录结果将显示在这里…"></textarea>
       <div class="meta-row">
         <span id="transcribeCharCount">0 字</span>
-        <span class="hint">可编辑后再分析</span>
+        <span class="meta-hint">可编辑后再分析</span>
       </div>
-      <section class="actions">
-        <button id="analyzeBtn" class="btn-action">🚀 使用 GPT-5 智能分析</button>
-        <span id="analyzeStatus" class="status-pill"></span>
-      </section>
+      <div class="action-row">
+        <button id="analyzeBtn" class="btn-outline">🚀 使用 GPT-5 智能分析</button>
+        <span id="analyzeStatus" class="status-text"></span>
+      </div>
     </section>
 
-    <section id="analysisResultPanel" class="glass panel result-section hidden">
-      <div class="panel-title-row">
-        <h2><i data-lucide="sparkles"></i>智能分析结果</h2>
-        <span class="hint-badge">GPT-5</span>
+    <section id="analysisResultPanel" class="result-card hidden">
+      <div class="result-head">
+        <h3 class="result-title">智能分析结果</h3>
+        <span class="result-badge">GPT-5</span>
       </div>
       <div id="analysisOutput" class="analysis-content"></div>
     </section>
 
-    <section id="exportPanel" class="glass panel result-section hidden">
-      <div class="panel-title-row">
-        <h2><i data-lucide="share-2"></i>导出</h2>
-      </div>
+    <section id="exportPanel" class="result-card hidden">
+      <h3 class="result-title">导出</h3>
       <div class="export-row">
-        <button id="exportTranscriptBtn" class="download-link" type="button"><i data-lucide="file-text"></i><span>导出转录文本 (.txt)</span></button>
-        <button id="exportAnalysisBtn" class="download-link" type="button"><i data-lucide="file-check"></i><span>导出分析结果 (.md)</span></button>
-        <button id="exportFullBtn" class="download-link" type="button"><i data-lucide="files"></i><span>导出完整报告 (.txt)</span></button>
+        <button id="exportTranscriptBtn" class="btn-outline btn-sm" type="button">导出转录文本 (.txt)</button>
+        <button id="exportAnalysisBtn" class="btn-outline btn-sm" type="button">导出分析结果 (.md)</button>
+        <button id="exportFullBtn" class="btn-outline btn-sm" type="button">导出完整报告 (.txt)</button>
       </div>
     </section>
 
-    <section id="transcribeErrorBox" class="glass error hidden"></section>
+    <section id="transcribeErrorBox" class="result-card error-card hidden"></section>
   </main>
 
-  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
-  <script>
-    if (window.lucide) {
-      window.lucide.createIcons({ attrs: { "stroke-width": "1.75" } });
-    }
-  </script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

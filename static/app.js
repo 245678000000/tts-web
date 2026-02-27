@@ -1,3 +1,43 @@
+/* ── Theme Management ── */
+
+(function initTheme() {
+  const toggle = document.getElementById("themeToggle");
+  const label = document.getElementById("themeLabel");
+  const root = document.documentElement;
+
+  const LABELS = { auto: "自动", light: "浅色", dark: "深色" };
+
+  function getPref() {
+    return localStorage.getItem("theme") || "auto";
+  }
+
+  function apply(pref) {
+    const resolved = pref === "auto"
+      ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+      : pref;
+    root.setAttribute("data-theme", resolved);
+    root.setAttribute("data-pref", pref);
+    localStorage.setItem("theme", pref);
+    if (label) label.textContent = LABELS[pref] || pref;
+  }
+
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      const cur = getPref();
+      const next = cur === "auto" ? "light" : cur === "light" ? "dark" : "auto";
+      apply(next);
+    });
+  }
+
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+    if (getPref() === "auto") apply("auto");
+  });
+
+  apply(getPref());
+})();
+
+/* ── TTS Controls ── */
+
 const textInput = document.getElementById("textInput");
 const charCount = document.getElementById("charCount");
 const voiceSelect = document.getElementById("voiceSelect");
@@ -307,6 +347,7 @@ async function doTranscribe() {
       try {
         const err = await res.json();
         if (err.message) msg = err.message;
+        else if (err.error) msg = err.error;
       } catch (_) {}
       throw new Error(msg);
     }
