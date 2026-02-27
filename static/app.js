@@ -20,7 +20,7 @@ function updateButtonState() {
 }
 
 function updateCharCount() {
-  charCount.textContent = `${textInput.value.length} 字`;
+  charCount.textContent = `${textInput.value.length} / 5000 字`;
   updateButtonState();
 }
 
@@ -151,6 +151,23 @@ window.addEventListener("beforeunload", resetAudioUrl);
 
 updateCharCount();
 loadVoices();
+
+/* ── Slider value display ── */
+
+const rateValueDisplay = document.getElementById("rateValue");
+const pitchValueDisplay = document.getElementById("pitchValue");
+
+if (rateValueDisplay) {
+  rateInput.addEventListener("input", function () {
+    rateValueDisplay.textContent = rateInput.value;
+  });
+}
+
+if (pitchValueDisplay) {
+  pitchInput.addEventListener("input", function () {
+    pitchValueDisplay.textContent = pitchInput.value;
+  });
+}
 
 /* ═══════════════════════════════════════════════════════════
    音频转录与智能分析
